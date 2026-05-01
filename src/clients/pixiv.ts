@@ -115,5 +115,3 @@ export async function pixivGet(
 
   return data;
 }
-
-

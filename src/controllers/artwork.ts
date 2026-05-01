@@ -1,7 +1,6 @@
 import { Context } from "hono";
 import { getPixivAccessToken, pixivGet } from "../clients/pixiv";
 import { enrichArtworkResponseWithResolvedUrls } from "../lib/pixivImageResolver";
-import { getPublicBaseUrl } from "../lib/requestOrigin";
 
 export async function artworkController(c: Context) {
   const idRaw = c.req.query("id");
@@ -23,7 +22,7 @@ export async function artworkController(c: Context) {
       { illust_id: String(illustId) },
       accessToken,
     );
-    const baseUrl = getPublicBaseUrl(c);
+    const baseUrl = new URL(c.req.url).origin;
     const enriched = enrichArtworkResponseWithResolvedUrls(response, baseUrl);
     return c.json(enriched as object);
   } catch (error) {
@@ -33,6 +32,3 @@ export async function artworkController(c: Context) {
     );
   }
 }
-
-
-

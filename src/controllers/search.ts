@@ -2,7 +2,6 @@ import { Context } from "hono";
 import { getPixivAccessToken, pixivGet } from "../clients/pixiv";
 import { getSearchCacheKey, getSearchCacheTtlMs, searchCache } from "../cache/search";
 import { enrichSearchResponseWithResolvedUrls } from "../lib/pixivImageResolver";
-import { getPublicBaseUrl } from "../lib/requestOrigin";
 
 export async function searchController(c: Context) {
   const q = c.req.query("query");
@@ -23,12 +22,10 @@ export async function searchController(c: Context) {
   }
 
   try {
-    const baseUrl = getPublicBaseUrl(c);
     const cacheKey = getSearchCacheKey(q, page);
     const cached = await searchCache.get(cacheKey);
     if (cached) {
-      const enrichedCached = enrichSearchResponseWithResolvedUrls(cached, baseUrl);
-      return c.json(enrichedCached as object);
+      return c.json(cached as object);
     }
 
     const accessToken = await getPixivAccessToken(refreshToken);
@@ -46,9 +43,10 @@ export async function searchController(c: Context) {
       accessToken,
     );
 
+    const baseUrl = new URL(c.req.url).origin;
     const enriched = enrichSearchResponseWithResolvedUrls(response, baseUrl);
 
-    await searchCache.set(cacheKey, response, getSearchCacheTtlMs());
+    await searchCache.set(cacheKey, enriched, getSearchCacheTtlMs());
     return c.json(enriched as object);
   } catch (error) {
     return c.json(
@@ -57,6 +55,3 @@ export async function searchController(c: Context) {
     );
   }
 }
-
-
-

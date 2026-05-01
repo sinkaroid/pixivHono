@@ -1,17 +1,26 @@
 import type { ObjectMap } from "../types/common";
 
+function normalizeResolverBase(baseUrl: string): string {
+  const forceHttpsEnabled = /^(1|true|yes|on)$/i.test(
+    (process.env.FORCE_HTTPS_PIXIV_IMG_RESOLVER ?? "").trim(),
+  );
+  return forceHttpsEnabled ? baseUrl.replace(/^http:\/\//i, "https://") : baseUrl;
+}
+
 function makeResolvedUrl(baseUrl: string, raw: string): string {
   const externalResolver = process.env.PIXIV_IMG_RESOLVER?.trim();
   if (externalResolver) {
-    const resolverBase = externalResolver.startsWith("http")
+    const resolverBaseRaw = externalResolver.startsWith("http")
       ? externalResolver
       : `https://${externalResolver}`;
+    const resolverBase = normalizeResolverBase(resolverBaseRaw);
     const normalizedResolver = resolverBase.replace(/\/+$/, "");
     const parsed = new URL(raw);
     return `${normalizedResolver}${parsed.pathname}${parsed.search}`;
   }
 
-  return `${baseUrl}/pixiv/img_resolver?url=${encodeURIComponent(raw)}`;
+  const normalizedBaseUrl = normalizeResolverBase(baseUrl);
+  return `${normalizedBaseUrl}/pixiv/img_resolver?url=${encodeURIComponent(raw)}`;
 }
 
 function addResolvedImageUrls(imageUrls: unknown, baseUrl: string): unknown {
@@ -88,5 +97,3 @@ export function enrichArtworkResponseWithResolvedUrls(payload: unknown, baseUrl:
     illust: enrichIllust(record.illust as ObjectMap, baseUrl),
   };
 }
-
-
