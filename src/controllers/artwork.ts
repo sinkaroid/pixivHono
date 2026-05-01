@@ -32,6 +32,3 @@ export async function artworkController(c: Context) {
     );
   }
 }
-
-
-

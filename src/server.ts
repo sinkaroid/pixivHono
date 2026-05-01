@@ -51,5 +51,3 @@ export default {
 };
 
 console.log(`Server running on http://localhost:${port}`);
-
-

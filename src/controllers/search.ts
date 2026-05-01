@@ -55,6 +55,3 @@ export async function searchController(c: Context) {
     );
   }
 }
-
-
-

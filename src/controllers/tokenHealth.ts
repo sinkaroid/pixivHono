@@ -33,5 +33,3 @@ export async function tokenHealthController(c: Context) {
     );
   }
 }
-
-
