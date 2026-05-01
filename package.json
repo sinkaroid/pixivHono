@@ -1,6 +1,6 @@
 {
   "name": "pixivhono",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "build": "bun run clean && tsc -p tsconfig.json",
     "start:dev": "bun --watch src/server.ts",
