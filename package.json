@@ -1,13 +1,13 @@
 {
   "name": "pixivhono",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "scripts": {
     "build": "bun run clean && tsc -p tsconfig.json",
     "start:dev": "bun --watch src/server.ts",
     "start:prod": "bun build/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "clean": "rimraf build"
+    "clean": "rm -rf build"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.6.1",
@@ -23,7 +23,6 @@
     "@typescript-eslint/parser": "^8.59.1",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
-    "rimraf": "^6.1.3",
     "typescript": "^6.0.3"
   },
   "packageManager": "bun@1.3.13"
