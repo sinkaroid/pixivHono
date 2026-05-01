@@ -1,0 +1,11 @@
+[build]
+target = "bun"
+format = "esm"
+
+[test]
+# Uncomment if you want to add test configuration
+# testNamePattern = ""
+# testTimeout = 5000
+
+[env]
+load = ".env"
