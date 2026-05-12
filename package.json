@@ -1,8 +1,8 @@
 {
   "name": "pixivhono",
-  "version": "1.0.7-alpha",
+  "version": "1.0.8-alpha",
   "scripts": {
-    "build": "bun run clean && bun build ./src/server.ts --outdir ./build --target=bun",
+    "build": "bun run clean && bun build ./src/server.ts --outdir ./build --target=bun && bun build ./src/lib/openapi-spec.ts --outdir ./build/lib --target=bun",
     "start:dev": "bun --watch src/server.ts",
     "start:prod": "bun ./build/server.js",
     "lint": "eslint .",
