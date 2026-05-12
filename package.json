@@ -1,10 +1,10 @@
 {
   "name": "pixivhono",
-  "version": "1.0.6",
+  "version": "1.0.7-alpha",
   "scripts": {
-    "build": "bun run clean && tsc -p tsconfig.json",
+    "build": "bun run clean && bun build ./src/server.ts --outdir ./build --target=bun",
     "start:dev": "bun --watch src/server.ts",
-    "start:prod": "bun build/server.js",
+    "start:prod": "bun ./build/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rm -rf build"
