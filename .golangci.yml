@@ -1,0 +1,30 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  go: '1.24'
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - staticcheck
+    - unused
+    - gofmt
+    - goconst
+    - misspell
+
+linters-settings:
+  govet:
+    enable-all: true
+  gofmt:
+    simplify: true
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

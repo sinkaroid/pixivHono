@@ -1,0 +1,33 @@
+# Config file for [Air](https://github.com/cosmtrek/air) in TOML format
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main.exe main.go"
+bin = "tmp/main.exe"
+include_ext = ["go", "tpl", "html", "yaml", "yml", "json", "env"]
+exclude_ext = ["test.go", "out", "tmp"]
+exclude_dir = ["pixivhono-legacy", "build", "tmp", "tests", ".github"]
+include_dir = []
+exclude_file = []
+exclude_regex = ["_test.go"]
+exclude_unchanged = true
+follow_symlink = true
+log = "air.log"
+delay = 1000 # ms
+stop_on_error = true
+send_interrupt = false
+kill_delay = 500 # ms
+
+[log]
+time = false
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[screen]
+clear_on_rebuild = false

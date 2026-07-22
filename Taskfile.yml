@@ -1,0 +1,62 @@
+version: '3'
+
+vars:
+  EXE:
+    sh: 'echo {{if eq OS "windows"}}.exe{{else}}{{end}}'
+
+tasks:
+  clean:
+    desc: Clean build outputs
+    cmds:
+      - cmd: rm -rf build
+        platforms: [linux, darwin]
+      - cmd: powershell -Command "Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue"
+        platforms: [windows]
+
+  build:
+    desc: Build production binary
+    deps: [clean]
+    cmds:
+      - go build -o build/server{{.EXE}} main.go
+
+  dev:
+    desc: Run development server with live-reloading (falls back to go run)
+    cmds:
+      - cmd: air
+        ignore_error: true
+      - cmd: go run main.go
+
+  start:
+    desc: Run production binary
+    cmds:
+      - build/server{{.EXE}}
+
+  lint:
+    desc: Run Go formatting, vet, and golangci-lint
+    cmds:
+      - go fmt ./...
+      - go vet ./...
+      - cmd: golangci-lint run
+        ignore_error: true
+
+  lint:fix:
+    desc: Auto-fix formatting and runs linters
+    cmds:
+      - go fmt ./...
+      - cmd: golangci-lint run --fix
+        ignore_error: true
+
+  test:
+    desc: Run all tests in the tests directory
+    cmds:
+      - go test -v ./tests
+
+  test:prod:
+    desc: Run live integration tests against the actual Pixiv API and Redis cache
+    cmds:
+      - go test -v ./tests
+
+
+
+
+
