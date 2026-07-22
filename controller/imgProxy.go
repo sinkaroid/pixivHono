@@ -54,7 +54,7 @@ func ImgProxyController(c *fiber.Ctx) error {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"error":  "Failed to resolve image",
 			"status": resp.StatusCode,

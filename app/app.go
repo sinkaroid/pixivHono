@@ -21,6 +21,11 @@ import (
 	"pixivhono/utils"
 )
 
+const (
+	docPath        = "/doc"
+	playgroundPath = "/playground"
+)
+
 var (
 	locationCacheMu sync.Mutex
 	cachedLocation  = "Unknown"
@@ -60,12 +65,12 @@ func getServerLocation() string {
 	if err != nil {
 		return cachedLocation
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var data struct {
-		Success bool   `json:"success"`
 		Country string `json:"country"`
 		Region  string `json:"region"`
+		Success bool   `json:"success"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil || !data.Success {
 		return cachedLocation
@@ -110,7 +115,7 @@ func SetupApp(cfg *config.Config) *fiber.App {
 	// ── API Key validation ──────────────────────────────
 	app.Use(func(c *fiber.Ctx) error {
 		path := c.Path()
-		if path == "/" || path == "/doc" || path == "/playground" || path == "/pixiv/img_resolver" || path == "/metrics" {
+		if path == "/" || path == docPath || path == playgroundPath || path == "/pixiv/img_resolver" || path == "/metrics" {
 			return c.Next()
 		}
 		return middleware.APIKeyMiddleware()(c)
@@ -119,7 +124,7 @@ func SetupApp(cfg *config.Config) *fiber.App {
 	// ── Traffic Control ─────────────────────────────────
 	app.Use(func(c *fiber.Ctx) error {
 		path := c.Path()
-		if path == "/" || path == "/doc" || path == "/playground" {
+		if path == "/" || path == docPath || path == playgroundPath {
 			return c.Next()
 		}
 		return middleware.SlowDownMiddleware()(c)
@@ -127,7 +132,7 @@ func SetupApp(cfg *config.Config) *fiber.App {
 
 	app.Use(func(c *fiber.Ctx) error {
 		path := c.Path()
-		if path == "/" || path == "/doc" || path == "/playground" {
+		if path == "/" || path == docPath || path == playgroundPath {
 			return c.Next()
 		}
 		return middleware.RateLimitMiddleware()(c)
@@ -154,7 +159,7 @@ func SetupApp(cfg *config.Config) *fiber.App {
 	})
 
 	// ── OpenAPI & Playground ────────────────────────────
-	app.Get("/doc", func(c *fiber.Ctx) error {
+	app.Get(docPath, func(c *fiber.Ctx) error {
 		c.Type("json")
 		return c.SendString(lib.OpenAPISpecJSON)
 	})

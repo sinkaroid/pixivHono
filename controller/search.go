@@ -41,7 +41,7 @@ func SearchController(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	// 1. Try to read from cache
-	if cachedBytes, err := cache.GlobalCache.Get(ctx, cacheKey); err == nil {
+	if cachedBytes, cacheErr := cache.GlobalCache.Get(ctx, cacheKey); cacheErr == nil {
 		c.Type("json")
 		return c.Send(cachedBytes)
 	}

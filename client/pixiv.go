@@ -24,9 +24,9 @@ var (
 )
 
 type tokenRefreshPromise struct {
+	err   error
 	done  chan struct{}
 	token string
-	err   error
 }
 
 type RefreshResponse struct {
@@ -76,7 +76,7 @@ func RefreshPixivAccessToken(refreshToken string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -178,7 +178,7 @@ func PixivGet(path string, params map[string]string, accessToken string) (interf
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {

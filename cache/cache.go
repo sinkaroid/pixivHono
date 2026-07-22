@@ -21,13 +21,13 @@ var (
 )
 
 type MemoryCacheItem struct {
-	Value     []byte
 	ExpiresAt time.Time
+	Value     []byte
 }
 
 type MemoryCache struct {
-	mu    sync.RWMutex
 	items map[string]MemoryCacheItem
+	mu    sync.RWMutex
 }
 
 func NewMemoryCache() *MemoryCache {

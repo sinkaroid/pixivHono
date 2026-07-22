@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 var (
@@ -18,28 +19,28 @@ var (
 	})
 	EventloopLag = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "eventloop_lag_seconds",
-		Help: "Event loop lag — delay of the event loop for synchronous blocking detection",
+		Help: "Calculated Event Loop latency in seconds (Go VM scheduler)",
 	})
-	CPUTotal = prometheus.NewCounter(prometheus.CounterOpts{
+	CPUTotal = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "process_cpu_seconds_total",
-		Help: "Total user + system CPU time spent (seconds)",
+		Help: "Total user and system CPU time spent in seconds",
 	})
 	HeapBytes = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "process_heap_bytes",
-		Help: "Heap memory usage (used / total)",
-	}, []string{"state"})
+		Name: "go_memory_allocated_bytes",
+		Help: "Current bytes of allocated heap or system virtual memory (used/total)",
+	}, []string{"type"})
 	Uptime = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "process_start_time_seconds",
-		Help: "Start time of the process since unix epoch (seconds)",
+		Help: "Unix timestamp of process start time",
 	})
 	Inflight = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "http_requests_in_flight",
-		Help: "Number of HTTP requests currently being processed (active)",
+		Help: "Current active in-flight requests",
 	}, []string{"method"})
 
 	RequestsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "http_requests_total",
-		Help: "Total number of HTTP requests",
+		Help: "Total HTTP requests processed",
 	}, []string{"method", "route", "status", "ok"})
 
 	RequestDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
@@ -51,7 +52,7 @@ var (
 
 func init() {
 	// Register standard Go runtime and Garbage Collection metrics
-	Registry.MustRegister(prometheus.NewGoCollector())
+	Registry.MustRegister(collectors.NewGoCollector())
 
 	Registry.MustRegister(RSS)
 	Registry.MustRegister(EventloopLag)

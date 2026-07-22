@@ -10,26 +10,26 @@ import (
 
 type Config struct {
 	APIKey                     string
-	RateLimitBucketMaxSize     int
 	PixivRefreshToken          string
-	EnableUserAgentLog         bool
+	PixivImgResolver           string
+	CORSOrigin                 string
+	RedisURL                   string
+	Version                    string
+	RateLimitBucketMaxSize     int
 	RateLimitMax               int
 	SlowDownDelayMs            int
-	RedisURL                   string
-	SearchCacheTTLMs           int
-	CORSOrigin                 string
 	SlowDownWindowMs           int
-	EnableAccessLog            bool
 	SlowDownMaxDelayMs         int
+	SlowDownDelayAfter         int
 	RateLimitSweepIntervalMs   int
 	RateLimitWindowMs          int
-	SlowDownDelayAfter         int
+	SearchCacheTTLMs           int
+	PixivAccessTokenTTLMs      int
+	Port                       int
+	EnableUserAgentLog         bool
+	EnableAccessLog            bool
 	AllowQueryAPIKeyInDev      bool
 	ForceHttpsPixivImgResolver bool
-	Port                       int
-	PixivImgResolver           string
-	PixivAccessTokenTTLMs      int
-	Version                    string
 }
 
 var (
