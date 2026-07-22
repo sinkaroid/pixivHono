@@ -37,23 +37,25 @@ pixivHono/
 ```
 
 ### Package Isolation
+
 - Root directory stays clean: only `main.go` and standard manifest files.
 - Packages are strictly separated by domain:
 
-| Package | Responsibility |
-|---------|----------------|
-| `config/` | Environment configuration loading and validation |
-| `cache/` | Caching logic (Redis/In-Memory) via `Cache` interface |
-| `client/` | External Pixiv API client (auth, search, refresh) |
-| `controller/` | HTTP request handlers |
-| `middleware/` | API key, rate limit, slow-down, CORS, inflight tracking |
-| `app/` | Router initialization & route-to-handler mapping |
-| `utils/` | Prometheus metrics, runtime & system resource collectors |
-| `lib/` | Domain-specific JSON transformers, OpenAPI spec constant |
-| `scripts/` | Standalone `package main` utilities (not the server) |
-| `tests/` | End-to-end integration tests (`package tests`) |
+| Package       | Responsibility                                           |
+| ------------- | -------------------------------------------------------- |
+| `config/`     | Environment configuration loading and validation         |
+| `cache/`      | Caching logic (Redis/In-Memory) via `Cache` interface    |
+| `client/`     | External Pixiv API client (auth, search, refresh)        |
+| `controller/` | HTTP request handlers                                    |
+| `middleware/` | API key, rate limit, slow-down, CORS, inflight tracking  |
+| `app/`        | Router initialization & route-to-handler mapping         |
+| `utils/`      | Prometheus metrics, runtime & system resource collectors |
+| `lib/`        | Domain-specific JSON transformers, OpenAPI spec constant |
+| `scripts/`    | Standalone `package main` utilities (not the server)     |
+| `tests/`      | End-to-end integration tests (`package tests`)           |
 
 ### Centralized Version Management
+
 - Version defined in `main.go` as a mutable variable:
   ```go
   var Version = "1.2.1-alpha"
@@ -82,17 +84,43 @@ pixivHono/
 - **OpenAPI Spec Generation**: `go run . -spec` prints OpenAPI JSON to stdout. Used in CI for Swagger playground deployment.
 - **Concurrent-Safe Operations**: Use `sync.Mutex`/`sync.RWMutex` for in-memory rate-limit buckets and caching maps.
 - **Task Automation**: All targets in `Taskfile.yml`. No `package.json` scripts.
+
 ### BEFORE APPLY CHANGES
+
 - **Lint Enforcement**: `golangci-lint` via `.golangci.yml` + `go fmt`. Run `task lint` before applying changes. Zero warnings.
 
+### GraphQL API
 
----
+Enable: `PIXIV_GRAPHQL=true` in `.env`.
+
+```bash
+# Query illust by ID
+curl -X POST http://localhost:3000/api/graphql \
+  -H "Authorization: Bearer ScathachGrip/bot" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ illust(id: 147501814) { id title image_urls { medium } } }"}'
+
+# Search illusts
+curl -X POST http://localhost:3000/api/graphql \
+  -H "Authorization: Bearer ScathachGrip/bot" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ search(query: \"yuri\", page: 1, limit: 5) { id title } }"}'
+
+curl -X POST http://localhost:3000/api/graphql \
+  -H "Authorization: Bearer ScathachGrip/bot" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ illust(id: 147501814) { image_urls { medium _resolved } } }"}'
+
+
+# Playground: open http://localhost:3000/graphql in browser (no auth)
+```
+
+Run tests: `task test:graphql`.---
 
 ## 4. CI/CD Pipeline
 
-| Workflow | Trigger | Description |
-|----------|---------|-------------|
-| `ci.yml` | Push/PR | Lint, test, build |
-| `dockerized.yml` | Push main | Build & push Docker image to ghcr.io |
+| Workflow         | Trigger   | Description                                               |
+| ---------------- | --------- | --------------------------------------------------------- |
+| `ci.yml`         | Push/PR   | Lint, test, build                                         |
+| `dockerized.yml` | Push main | Build & push Docker image to ghcr.io                      |
 | `playground.yml` | Push main | Generate OpenAPI spec + deploy Swagger UI to GitHub Pages |
-

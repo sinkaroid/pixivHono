@@ -201,5 +201,12 @@ func SetupApp(cfg *config.Config) *fiber.App {
 	app.Get("/pixiv/img_resolver", controller.ImgProxyController)
 	app.Get("/pixiv/token_health", controller.TokenHealthController)
 
+	// ── GraphQL ─────────────────────────────────────────
+	if cfg.EnableGraphQL {
+		gql := controller.NewGraphQLHandler(cfg)
+		app.Post("/api/graphql", gql.Handle)
+		app.Get("/graphql", gql.Playground)
+	}
+
 	return app
 }

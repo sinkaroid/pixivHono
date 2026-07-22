@@ -30,6 +30,7 @@ type Config struct {
 	EnableAccessLog            bool
 	AllowQueryAPIKeyInDev      bool
 	ForceHttpsPixivImgResolver bool
+	EnableGraphQL              bool
 }
 
 var (
@@ -82,6 +83,7 @@ func Load() *Config {
 		ForceHttpsPixivImgResolver: getEnvBool("FORCE_HTTPS_PIXIV_IMG_RESOLVER", false),
 		Port:                       getEnvInt("PORT", 3000),
 		PixivImgResolver:           os.Getenv("PIXIV_IMG_RESOLVER"),
+		EnableGraphQL:              getEnvBool("PIXIV_GRAPHQL", false),
 	}
 
 	// Cache TTL checks PIXIV_REFRESHED_ACCESS_TOKEN_CACHE_TTL_MS first, then PIXIV_ACCESS_TOKEN_TTL_MS, then defaults to 3,000,000

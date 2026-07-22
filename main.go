@@ -13,7 +13,7 @@ import (
 	"pixivhono/utils"
 )
 
-var Version = "1.2.1-alpha"
+var Version = "1.2.2-alpha"
 
 func main() {
 	spec := flag.Bool("spec", false, "print OpenAPI spec JSON and exit")

@@ -56,6 +56,11 @@ tasks:
     cmds:
       - go test -v ./tests
 
+  test:graphql:
+    desc: Run GraphQL integration tests only
+    cmds:
+      - go test -v ./tests -run GraphQL
+
 
 
 
