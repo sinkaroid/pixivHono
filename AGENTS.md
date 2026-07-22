@@ -1,50 +1,98 @@
 # Workspace Rules & AI Instructions: pixivHono (Go/Fiber)
 
+> [!CAUTION]
+> **AI AGENTS ARE FORBIDDEN FROM RUNNING GIT COMMANDS**
+> Agents must NOT execute any `git` commands (commit, push, pull, add, checkout, etc.).
+> All version control operations are done manually by the user.
+> Violation will cause the agent to be terminated.
+
 These rules define the design, coding standards, and architectural guidelines for managing the `pixivHono` Go repository. Any agent modifying this repository must adhere to these conventions.
 
 ---
 
-## 1. Architectural Standards
+## 1. Project Structure
 
-### Directory Structure & Package Isolation
-- The root directory must remain clean of loose utility and configuration files. It should only contain `main.go` and standard project manifest files.
-- Modulize the application strictly into distinct packages:
-  - `config/`: Environment configuration loading and validation.
-  - `cache/`: Caching logic (Redis/In-Memory).
-  - `client/`: External client APIs (Pixiv integration).
-  - `controller/`: Request handlers.
-  - `middleware/`: Custom traffic and auth filters (API key, rate limit, CORS).
-  - `app/`: Router initialization and route mapping to prevent package `main` import locks.
-  - `utils/`: System resource scraping and metrics collectors.
-  - `lib/`: Domain-specific JSON transformers (image URL resolver).
+```
+pixivHono/
+├── main.go              # Entry point. Also: `go run . -spec` prints OpenAPI spec
+├── app/                 # Router init, route mapping, middleware bypass logic
+├── cache/               # In-memory & Redis caching (Cache interface)
+├── client/              # Pixiv API client (OAuth, search, token refresh)
+├── config/              # Env loading & Config struct
+├── controller/          # Request handlers (search, img proxy, illust, user)
+├── lib/                 # OpenAPI spec JSON const, image URL resolver
+├── middleware/          # API key, rate-limit, slow-down, CORS, inflight
+├── scripts/             # Standalone Go tools (package main, but not the server)
+├── tests/               # Integration tests (package tests)
+├── utils/               # Prometheus metrics, system resource collectors
+├── .github/workflows/   # CI, dockerized build, playground deploy
+├── build/               # Docker context output
+├── pixivhono-legacy/    # Legacy TypeScript Hono (read-only reference)
+├── tmp/                 # Air hot-reload temp files (gitignored)
+├── Taskfile.yml         # Automation targets (lint, test, build, run)
+├── Dockerfile           # Multi-stage container build
+├── .air.toml            # Hot-reload config
+├── .golangci.yml        # Linter configuration
+└── go.mod / go.sum
+```
+
+### Package Isolation
+- Root directory stays clean: only `main.go` and standard manifest files.
+- Packages are strictly separated by domain:
+
+| Package | Responsibility |
+|---------|----------------|
+| `config/` | Environment configuration loading and validation |
+| `cache/` | Caching logic (Redis/In-Memory) via `Cache` interface |
+| `client/` | External Pixiv API client (auth, search, refresh) |
+| `controller/` | HTTP request handlers |
+| `middleware/` | API key, rate limit, slow-down, CORS, inflight tracking |
+| `app/` | Router initialization & route-to-handler mapping |
+| `utils/` | Prometheus metrics, runtime & system resource collectors |
+| `lib/` | Domain-specific JSON transformers, OpenAPI spec constant |
+| `scripts/` | Standalone `package main` utilities (not the server) |
+| `tests/` | End-to-end integration tests (`package tests`) |
 
 ### Centralized Version Management
-- The application version must be defined at the root of the workspace inside `main.go` as a mutable package-level variable:
+- Version defined in `main.go` as a mutable variable:
   ```go
-  var Version = "1.1.0-alpha"
+  var Version = "1.2.1-alpha"
   ```
-  *Reason*: This permits dynamic compile-time version injection via standard compiler flags during the build process:
+  Allows dynamic injection via `-ldflags`:
   ```bash
   go build -ldflags "-X main.Version=1.2.0"
   ```
-- Any sub-package requiring the version string must read it dynamically via the `config.Config` configuration object.
+- Sub-packages read version from `config.Config.Version`.
 
 ---
 
 ## 2. Testing Guidelines
 
-- **Zero Root Pollution**: No test files (`*_test.go`) are permitted at the root directory of the workspace.
-- **Dedicated `/tests` Package**: All end-to-end integration and API tests must reside in a dedicated `/tests` directory under `package tests`.
-- **Exposed Router for Testing**: The application routing setup must be exported from the `app` package via `SetupApp(cfg *config.Config) *fiber.App`. This allows external test runners to spin up mock client requests context-safely using `app.Test(...)` without binding actual TCP ports.
-- **External Mocking**: Outgoing HTTPS requests (e.g. auth and image servers) must be intercepted using a local `httptest.NewTLSServer` and a custom transport dialer redirect rather than introducing network dependencies in tests.
+- **Zero Root Pollution**: No `*_test.go` files at root.
+- **Dedicated `/tests` Package**: All integration/API tests in `/tests` under `package tests`.
+- **Exported Router for Testing**: `app.SetupApp(cfg *config.Config) *fiber.App` allows `app.Test(...)` without binding TCP ports.
+- **External Mocking**: Outgoing HTTPS requests intercepted via `httptest.NewTLSServer` + custom transport dialer.
 
 ---
 
-## 3. Parity & Coding Conventions
+## 3. Key Conventions
 
-- **1:1 Behavioral Parity**: Behavior, status codes, headers, and JSON error schemas must match the legacy TypeScript Hono implementation (`pixivhono-legacy`) exactly.
-- **Concurrent-Safe Operations**: Use locks (`sync.Mutex` or `sync.RWMutex`) to safeguard in-memory data structures like sliding rate-limit buckets and caching maps against concurrent race conditions.
-- **Task Automation**: Use `Taskfile.yml` to define automation targets. Do not fall back to `package.json` scripts.
-- **Hot Reloader**: Exclude `pixivhono-legacy` (which contains legacy `node_modules`), `/tests`, `/build`, and `tmp` directories inside `.air.toml` to prevent infinite watch loops and high CPU usage.
-- **Lint Enforcement**: Code style and static analysis are enforced via `golangci-lint` (using `.golangci.yml` guidelines) and `go fmt`.
+- **Behavioral Parity**: Status codes, headers, JSON error schemas must match `pixivhono-legacy` exactly.
+- **Middleware Bypass**: Routes `/`, `/doc`, `/playground`, `/pixiv/img_resolver`, `/metrics` bypass API key auth. Traffic control (slow-down, rate-limit) bypasses `/`, `/doc`, `/playground`. See `app/app.go`.
+- **OpenAPI Spec Generation**: `go run . -spec` prints OpenAPI JSON to stdout. Used in CI for Swagger playground deployment.
+- **Concurrent-Safe Operations**: Use `sync.Mutex`/`sync.RWMutex` for in-memory rate-limit buckets and caching maps.
+- **Task Automation**: All targets in `Taskfile.yml`. No `package.json` scripts.
+### BEFORE APPLY CHANGES
+- **Lint Enforcement**: `golangci-lint` via `.golangci.yml` + `go fmt`. Run `task lint` before applying changes. Zero warnings.
+
+
+---
+
+## 4. CI/CD Pipeline
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `ci.yml` | Push/PR | Lint, test, build |
+| `dockerized.yml` | Push main | Build & push Docker image to ghcr.io |
+| `playground.yml` | Push main | Generate OpenAPI spec + deploy Swagger UI to GitHub Pages |
 
