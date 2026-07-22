@@ -1,19 +1,28 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"strconv"
 
 	"pixivhono/app"
 	"pixivhono/cache"
 	"pixivhono/config"
+	"pixivhono/lib"
 	"pixivhono/middleware"
 	"pixivhono/utils"
 )
 
-var Version = "1.2.0-alpha"
+var Version = "1.2.1-alpha"
 
 func main() {
+	spec := flag.Bool("spec", false, "print OpenAPI spec JSON and exit")
+	flag.Parse()
+	if *spec {
+		fmt.Println(lib.OpenAPISpecJSON)
+		return
+	}
+
 	cfg := config.Load()
 	cfg.Version = Version
 

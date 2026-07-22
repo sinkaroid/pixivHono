@@ -31,7 +31,7 @@ jobs:
         run: mkdir -p dist
 
       - name: Generate OpenAPI spec
-        run: go run scripts/gen_spec.go > dist/openapi.json
+        run: go run . -spec > dist/openapi.json
 
       - name: Create playground HTML
         run: |
