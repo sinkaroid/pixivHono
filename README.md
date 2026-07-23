@@ -7,7 +7,7 @@
 	<a href="https://qlty.sh/gh/sinkaroid/projects/pixivHono"><img src="https://qlty.sh/gh/sinkaroid/projects/pixivHono/maintainability.png" alt="Maintainability" /></a>
 </p>
 
-pixivHono was originally built with **TypeScript + Hono** and now runs on **Go + Fiber**
+pixivHono was originally built with **Pixiv + Hono** + TypeScript (legacy name) and now runs on **Go + Fiber** with near-zero GC overhead, sub-10 MB baseline memory, and native concurrency. The motivation is simple: one gateway, one config, no more building Pixiv proxy, wrestling 403s, or reinventing OAuth refresh.
 
 <a href="https://sinkaroid.github.io/pixivhono">Playground</a> •
 <a href="https://github.com/sinkaroid/pixivhono/blob/master/CONTRIBUTING.md">Contributing</a> •
@@ -22,8 +22,6 @@ pixivHono was originally built with **TypeScript + Hono** and now runs on **Go +
 - [Jandapress](#)
   - [The problems](#the-problems)
   - [The solutions](#the-solutions)
-  - [Running tests](#running-tests)
-    - [Tests](#tests)
   - [Features](#features)
   - [Prerequisites](#prerequisites)
     - [Installation](#installation)
@@ -34,6 +32,8 @@ pixivHono was originally built with **TypeScript + Hono** and now runs on **Go +
   - [Playground](https://sinkaroid.github.io/jandapress)
     - [Routing](#playground)
     - [Status response](#status-response)
+  - [Running tests](#running-tests)
+    - [Tests](#tests)
   - [CLosing remarks](https://github.com/sinkaroid/jandapress/blob/master/CLOSING_REMARKS.md)
     - [Alternative links](https://github.com/sinkaroid/jandapress/blob/master/CLOSING_REMARKS.md#alternative-links)
   - [Pronunciation](#Pronunciation)
