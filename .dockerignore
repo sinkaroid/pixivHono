@@ -1,0 +1,36 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Build output
+build/
+tmp/
+*.exe
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+
+# Legacy reference
+pixivhono-legacy/
+
+# CI
+.github/
+
+# Air hot-reload
+air.log
+
+# Taskfile
+Taskfile.yml
