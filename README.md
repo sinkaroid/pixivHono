@@ -7,7 +7,8 @@
 	<a href="https://qlty.sh/gh/sinkaroid/projects/pixivHono"><img src="https://qlty.sh/gh/sinkaroid/projects/pixivHono/maintainability.png" alt="Maintainability" /></a>
 </p>
 
-pixivHono was originally built with **Pixiv + Hono** + TypeScript (legacy name) and now runs on **Go + Fiber** with near-zero GC overhead, sub-10 MB baseline memory, and native concurrency. The motivation is simple: one gateway, one config, no more building Pixiv proxy, wrestling 403s, or reinventing OAuth refresh.
+pixivHono was originally built with **Pixiv + Hono** + TypeScript (legacy name) and now runs on **Go + Fiber** with near-zero GC overhead, sub-10 MB baseline memory, and native concurrency.  
+The motivation behind this project is: one gateway, one config, no more building Pixiv proxy, wrestling 403s, or reinventing OAuth refresh.
 
 <a href="https://sinkaroid.github.io/pixivhono">Playground</a> •
 <a href="https://github.com/sinkaroid/pixivhono/blob/master/CONTRIBUTING.md">Contributing</a> •
