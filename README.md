@@ -1,3 +1,77 @@
+<div align="center">
+<a href="https://sinkaroid.github.io/pixivHono/"><img width="500" src="resources/project/images/pixivhono.png" alt="pixivhono"></a>
+
+<h4 align="center">Unified REST + GraphQL gateway for Pixiv API + image resolver</h4>
+<p align="center">
+	<a href="https://github.com/sinkaroid/pixivHono/actions/workflows/playground.yml"><img src="https://github.com/sinkaroid/pixivHono/workflows/Playground/badge.svg"></a>
+	<a href="https://qlty.sh/gh/sinkaroid/projects/pixivHono"><img src="https://qlty.sh/gh/sinkaroid/projects/pixivHono/maintainability.png" alt="Maintainability" /></a>
+</p>
+
+pixivHono was originally built with **TypeScript + Hono** and now runs on **Go + Fiber**
+
+<a href="https://sinkaroid.github.io/pixivhono">Playground</a> •
+<a href="https://github.com/sinkaroid/pixivhono/blob/master/CONTRIBUTING.md">Contributing</a> •
+<a href="https://github.com/sinkaroid/pixivhono/issues/new/choose">Report Issues</a>
+
+</div>
+
+---
+
+<a href="https://sinkaroid.github.io/pixivHono/"><img align="right" src="resources/project/images/pixivhono-docs.png" width="300"></a>
+
+- [Jandapress](#)
+  - [The problems](#the-problems)
+  - [The solutions](#the-solutions)
+  - [Running tests](#running-tests)
+    - [Tests](#tests)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+      - [Docker](#docker)
+      - [Manual](#manual)
+    - [Tests](#tests)
+    - [Nhentai Guide](#nhentai-guide)
+  - [Playground](https://sinkaroid.github.io/jandapress)
+    - [Routing](#playground)
+    - [Status response](#status-response)
+  - [CLosing remarks](https://github.com/sinkaroid/jandapress/blob/master/CLOSING_REMARKS.md)
+    - [Alternative links](https://github.com/sinkaroid/jandapress/blob/master/CLOSING_REMARKS.md#alternative-links)
+  - [Pronunciation](#Pronunciation)
+  - [Legal](#legal)
+  - [Microservices](#microservices)
+
+## The problems
+
+Pixiv's official API has severe limitations when consumed directly from client-side applications:
+
+- **CORS restrictions** — Pixiv's API endpoints (`app-api.pixiv.net`, `oauth.secure.pixiv.net`) do not permit browser-origin requests, making direct AJAX calls impossible from web apps.
+- **Image hotlink protection** — Pixiv image hosts (`i.pximg.net`) returns `403 Forbidden` when the `Referer` header is missing or doesn't match their expected origin. This breaks all embedded image rendering outside pixiv.net.
+- **OAuth complexity** — The refresh-token flow requires multiple round-trips, client-side secrets, and manual token refresh logic — none of which belong in a browser context.
+- **No public search API** — Pixiv exposes no official search or discovery endpoint for third-party clients.
+
+Pixiv-powered frontend (gallery, wallpaper app, image board) must solve all four problems themselves — every single time.
+
+## The solutions
+
+`pixivHono` is a **unified REST + GraphQL gateway** that sits between your application and Pixiv, solving every problem above:
+
+| Problem             | Solution                                                                                                                                      |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| CORS & AJAX blocked | Proxy all Pixiv API calls through a CORS-enabled gateway                                                                                      |
+| Image 403 errors    | Built-in `img_resolver` rewrites `i.pximg.net` URLs through a configurable proxy domain — set `PIXIV_IMG_RESOLVER` and images render anywhere |
+| OAuth tedium        | Automatic token refresh behind a single `PIXIV_REFRESH_TOKEN` env var; access tokens cached and rotated transparently                         |
+| No search API       | REST `/search` and GraphQL `search()` query powered by Pixiv's internal search                                                                |
+
+Beyond the proxy layer, you get:
+
+- **REST** + **GraphQL** (opt-in via `PIXIV_GRAPHQL=true`) — query exactly the data you need.
+- **Rate limiting & slow-down** — protect upstream from abuse.
+- **Redis caching** — configurable TTLs for search responses and access tokens.
+- **Prometheus metrics** — track request rates, cache hits, and upstream latency.
+- **OpenAPI / Swagger** — interactive playground at `/playground`.
+
+No scraping. No reverse-engineering auth flows. No client-side secrets. One gateway, one `.env`, done.
+
 ## pixivHono
 
 Rename `.env.schema` to `.env` and fill the value with your own
