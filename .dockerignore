@@ -34,3 +34,6 @@ air.log
 
 # Taskfile
 Taskfile.yml
+
+# Resources
+resources/
