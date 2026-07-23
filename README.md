@@ -120,3 +120,27 @@ task start
 # 5. Print OpenAPI spec
 go run . -spec
 ```
+
+---
+
+## Pixiv OAuth Credentials & Fallback
+
+By default, `pixivHono` includes built-in fallback OAuth client credentials obtained via reverse engineering the official Pixiv Mobile App (iOS/Android), widely used across open-source Pixiv API clients (reference: [`upbit/pixivpy`](https://github.com/upbit/pixivpy/blob/master/pixivpy3/api.py#L26-L28)):
+
+- **Default Client ID**: `MOBrBDS8blbauoSck0ZfDbtuzpyT`
+- **Default Client Secret**: `lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj`
+- **Default Hash Secret**: `28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c`
+
+### What happens if Pixiv updates their credentials?
+
+If Pixiv rotates or revokes these official app credentials in a future update, OAuth token authentication will fail (e.g. returning `400 Bad Request` / `invalid_client`).
+
+**You do NOT need to modify or re-compile the source code.** You can override any of these secrets directly in your `.env` file or environment variables:
+
+```env
+PIXIV_CLIENT_ID=your_new_client_id
+PIXIV_CLIENT_SECRET=your_new_client_secret
+PIXIV_HASH_SECRET=your_new_hash_secret
+PIXIV_OAUTH_URL=https://oauth.secure.pixiv.net/auth/token
+PIXIV_APP_API_BASE=https://app-api.pixiv.net
+```
