@@ -3,6 +3,7 @@ package utils
 import (
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -66,7 +67,7 @@ func init() {
 
 func InflightMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		method := c.Method()
+		method := strings.Clone(c.Method())
 		Inflight.WithLabelValues(method).Inc()
 		defer Inflight.WithLabelValues(method).Dec()
 
@@ -78,6 +79,7 @@ func InflightMiddleware() fiber.Handler {
 		if r := c.Route(); r != nil {
 			route = r.Path
 		}
+		route = strings.Clone(route)
 
 		status := c.Response().StatusCode()
 		statusStr := strconv.Itoa(status)
